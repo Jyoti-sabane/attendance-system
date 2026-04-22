@@ -29,45 +29,57 @@ const AuthPage = ({ type }) => {
     
     try {
       if (isLogin) {
+        // LOGIN
         const response = await login({
           username: formData.username,
           password: formData.password
         });
-        if (response.success) {
+        
+        console.log('Login response:', response); // Debug log
+        
+        if (response && response.success) {
+          toast.success('Login successful!');
           navigate(response.redirect);
+        } else {
+          toast.error('Login failed. Please try again.');
         }
       } else {
-        // Check if passwords match
+        // REGISTER
         if (formData.password !== formData.confirm_password) {
           toast.error('Passwords do not match!');
           setLoading(false);
           return;
         }
         
-        // Send ALL data including confirm_password
-        await register({
+        const response = await register({
           username: formData.username,
           password: formData.password,
-          confirm_password: formData.confirm_password,  // ADD THIS LINE
+          confirm_password: formData.confirm_password,
           email: formData.email,
           full_name: formData.full_name,
           role: formData.role
         });
         
-        // Clear form and switch to login
-        setIsLogin(true);
-        setFormData({ 
-          username: '', 
-          password: '', 
-          confirm_password: '', 
-          email: '', 
-          full_name: '', 
-          role: 'staff' 
-        });
-        toast.success('Registration successful! Please login.');
+        console.log('Register response:', response); // Debug log
+        
+        if (response && response.success) {
+          toast.success('Registration successful! Please login.');
+          setIsLogin(true);
+          setFormData({ 
+            username: '', 
+            password: '', 
+            confirm_password: '', 
+            email: '', 
+            full_name: '', 
+            role: 'staff' 
+          });
+        } else {
+          toast.error(response?.error || 'Registration failed');
+        }
       }
     } catch (error) {
       console.error('Auth error:', error);
+      toast.error(error.response?.data?.error || 'Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -147,8 +159,8 @@ const AuthPage = ({ type }) => {
             </div>
           )}
           
-          <button type="submit" className="btn">
-            {isLogin ? 'Login' : 'Register'}
+          <button type="submit" className="btn" disabled={loading}>
+            {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Register')}
           </button>
         </form>
         

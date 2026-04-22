@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Use environment variable for API URL
-const API_URL = process.env.REACT_APP_API_URL || '/api';
+// DIRECTLY USE YOUR DEPLOYED BACKEND URL
+const API_URL = 'https://attendance-system-hlpr.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,

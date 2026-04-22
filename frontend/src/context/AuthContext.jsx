@@ -32,12 +32,16 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.post('/api/auth/login', credentials, {
         withCredentials: true
       });
+      
+      console.log('Login API response:', response.data); // Debug log
+      
       if (response.data.success) {
         setUser(response.data.user);
-        toast.success('Login successful!');
-        return response.data;
+        return response.data; // Return the full response data
       }
+      return response.data;
     } catch (error) {
+      console.error('Login error:', error);
       const errorMsg = error.response?.data?.error || 'Login failed';
       toast.error(errorMsg);
       throw error;
@@ -46,14 +50,22 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('/api/auth/register', userData, {
+      const response = await axios.post('/api/auth/register', {
+        username: userData.username,
+        password: userData.password,
+        confirm_password: userData.confirm_password,
+        email: userData.email,
+        full_name: userData.full_name,
+        role: userData.role
+      }, {
         withCredentials: true
       });
-      if (response.data.success) {
-        toast.success('Registration successful! Please login.');
-        return response.data;
-      }
+      
+      console.log('Register API response:', response.data); // Debug log
+      
+      return response.data;
     } catch (error) {
+      console.error('Register error:', error);
       const errorMsg = error.response?.data?.error || 'Registration failed';
       toast.error(errorMsg);
       throw error;

@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkSession = async () => {
     try {
-      const response = await axios.get('/api/auth/check-session', {
+      const response = await axios.get('https://attendance-system-hlpr.onrender.com/api/auth/check-session', {
         withCredentials: true
       });
       if (response.data.authenticated) {
@@ -29,15 +29,17 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const response = await axios.post('/api/auth/login', credentials, {
-        withCredentials: true
+      const response = await axios.post('https://attendance-system-hlpr.onrender.com/api/auth/login', credentials, {
+        withCredentials: true,
+        headers: { 'Content-Type': 'application/json' }
       });
       
-      console.log('Login API response:', response.data); // Debug log
+      console.log('Login API response:', response.data);
       
       if (response.data.success) {
         setUser(response.data.user);
-        return response.data; // Return the full response data
+        toast.success('Login successful!');
+        return response.data;
       }
       return response.data;
     } catch (error) {
@@ -50,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('/api/auth/register', {
+      const response = await axios.post('https://attendance-system-hlpr.onrender.com/api/auth/register', {
         username: userData.username,
         password: userData.password,
         confirm_password: userData.confirm_password,
@@ -61,8 +63,7 @@ export const AuthProvider = ({ children }) => {
         withCredentials: true
       });
       
-      console.log('Register API response:', response.data); // Debug log
-      
+      console.log('Register API response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Register error:', error);
@@ -74,7 +75,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('/api/auth/logout', {}, { withCredentials: true });
+      await axios.post('https://attendance-system-hlpr.onrender.com/api/auth/logout', {}, { withCredentials: true });
       setUser(null);
       toast.success('Logged out successfully');
       window.location.href = '/login';

@@ -76,7 +76,6 @@ const logout = (req, res) => {
 };
 
 const checkSession = (req, res) => {
-    // This will be handled by token verification
     res.json({ authenticated: false });
 };
 

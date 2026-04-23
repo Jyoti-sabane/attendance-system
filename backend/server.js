@@ -1,5 +1,4 @@
 const express = require('express');
-const session = require('express-session');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -13,35 +12,17 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Trust proxy - ABSOLUTELY REQUIRED for Render
-app.set('trust proxy', 1);
-
-// CORS - Allow your frontend
+// CORS configuration
 app.use(cors({
     origin: 'https://attendance-frontend-3m8n.onrender.com',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'Set-Cookie']
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Session configuration - PROVEN WORKING
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: true,
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: 'none',
-        domain: '.onrender.com'
-    },
-    name: 'connect.sid'
-}));
 
 // Routes
 app.use('/api/auth', authRoutes);

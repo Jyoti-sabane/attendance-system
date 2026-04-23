@@ -9,10 +9,8 @@ const staffRoutes = require('./routes/staffRoutes');
 
 const app = express();
 
-// Connect to MongoDB
 connectDB();
 
-// CORS configuration
 app.use(cors({
     origin: 'https://attendance-frontend-3m8n.onrender.com',
     credentials: true,
@@ -20,16 +18,13 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/staff', staffRoutes);
 
-// Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
 });

@@ -1,26 +1,15 @@
 import axios from 'axios';
 
+// Use the full URL to your backend
 const API_URL = 'https://attendance-system-hlpr.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true,  // CRITICAL - sends cookies
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   }
 });
-
-// Add response interceptor for debugging
-api.interceptors.response.use(
-  (response) => {
-    console.log('API Response:', response.status, response.data);
-    return response;
-  },
-  (error) => {
-    console.error('API Error:', error.response?.status, error.response?.data);
-    return Promise.reject(error);
-  }
-);
 
 export const adminAPI = {
   getStats: () => api.get('/admin/stats'),

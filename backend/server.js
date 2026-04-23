@@ -14,14 +14,16 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// CORS configuration - Allow your frontend
+// Trust proxy - Required for Render
+app.set('trust proxy', 1);
+
+// CORS configuration
 app.use(cors({
     origin: [
         'http://localhost:3000',
-        'https://attendance-frontend-3m8n.onrender.com',
-        'https://attendance-system-hlpr.onrender.com'
+        'https://attendance-frontend-3m8n.onrender.com'
     ],
-    credentials: true,  // THIS IS CRITICAL
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'Set-Cookie']
 }));
@@ -30,19 +32,19 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session configuration - FIXED FOR PRODUCTION
+// Session configuration - FIXED VERSION
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'fallback_secret_key_change_this',
+    secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: true,  // IMPORTANT: Set to true for HTTPS (Render uses HTTPS)
+        secure: true,           // Required for HTTPS (Render uses HTTPS)
         httpOnly: true,
-        maxAge: 30 * 60 * 1000,  // 30 minutes
-        sameSite: 'none',  // IMPORTANT: 'none' allows cross-site requests
-        domain: '.onrender.com'  // Allow cookies across Render subdomains
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        sameSite: 'none',       // Required for cross-site requests
+        domain: '.onrender.com' // Allow across Render subdomains
     },
-    proxy: true  // Trust the proxy (Render uses proxies)
+    name: 'sessionId'           // Custom cookie name
 }));
 
 // API Routes
@@ -53,12 +55,6 @@ app.use('/api/staff', staffRoutes);
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong!' });
 });
 
 const PORT = process.env.PORT || 5000;

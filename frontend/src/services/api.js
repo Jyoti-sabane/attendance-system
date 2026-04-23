@@ -4,7 +4,7 @@ const API_URL = 'https://attendance-system-hlpr.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true,  // THIS IS CRITICAL - sends cookies
+  withCredentials: true,  // CRITICAL - sends cookies
   headers: {
     'Content-Type': 'application/json'
   }

@@ -7,7 +7,6 @@ const staffController = require('../controllers/staffController');
 router.use(verifyToken);
 router.use(isStaff);
 
-// Staff routes
 router.get('/subjects', staffController.getAssignedSubjects);
 router.get('/students/all', staffController.getAllStudents);
 router.post('/assign-students', staffController.assignStudentsToSubject);

@@ -7,7 +7,6 @@ const adminController = require('../controllers/adminController');
 router.use(verifyToken);
 router.use(isAdmin);
 
-// Admin routes
 router.get('/stats', adminController.getDashboardStats);
 router.get('/students', adminController.getStudents);
 router.post('/students', adminController.addStudent);

@@ -14,10 +14,10 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Trust proxy - CRITICAL for Render
+// Trust proxy - REQUIRED for Render
 app.set('trust proxy', 1);
 
-// CORS configuration
+// CORS configuration - Allow your frontend
 app.use(cors({
     origin: [
         'http://localhost:3000',
@@ -38,22 +38,21 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: true,           // HTTPS only
+        secure: true,           // Required for HTTPS
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        sameSite: 'none',       // Required for cross-site requests
-        domain: '.onrender.com' // Allow across Render subdomains
+        sameSite: 'none',       // Required for cross-origin
+        domain: '.onrender.com' // Allow cookie across Render subdomains
     },
-    name: 'sessionId',
-    proxy: true
+    name: 'sessionId'
 }));
 
-// Debug middleware - log all requests and session
+// Debug middleware - log all requests (REMOVE AFTER FIXING)
 app.use((req, res, next) => {
     console.log(`\n📌 ${req.method} ${req.url}`);
-    console.log(`   Session ID: ${req.session?.id}`);
+    console.log(`   Session ID: ${req.session?.id || 'none'}`);
     console.log(`   Session User: ${req.session?.user?.username || 'none'}`);
-    console.log(`   Cookies: ${req.headers.cookie || 'none'}`);
+    console.log(`   Cookie Header: ${req.headers.cookie || 'none'}`);
     next();
 });
 
@@ -65,6 +64,12 @@ app.use('/api/staff', staffRoutes);
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+    console.error('Server error:', err);
+    res.status(500).json({ error: 'Internal server error' });
 });
 
 const PORT = process.env.PORT || 5000;

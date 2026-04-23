@@ -1,38 +1,23 @@
 import axios from 'axios';
 
-// DIRECTLY USE YOUR DEPLOYED BACKEND URL
 const API_URL = 'https://attendance-system-hlpr.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
+  withCredentials: true,  // THIS IS CRITICAL - sends cookies
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-// Add request interceptor for debugging
-api.interceptors.request.use(
-  (config) => {
-    console.log(`📤 API Request: ${config.method.toUpperCase()} ${config.baseURL}${config.url}`);
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor for error handling
+// Add response interceptor for debugging
 api.interceptors.response.use(
   (response) => {
-    console.log(`✅ API Response: ${response.status}`);
+    console.log('API Response:', response.status, response.data);
     return response;
   },
   (error) => {
-    console.error(`❌ API Error:`, error.response?.status, error.message);
-    if (error.response?.status === 401) {
-      window.location.href = '/login';
-    }
+    console.error('API Error:', error.response?.status, error.response?.data);
     return Promise.reject(error);
   }
 );

@@ -3,9 +3,11 @@ const router = express.Router();
 const { validateSession, isStaff } = require('../middleware/auth');
 const staffController = require('../controllers/staffController');
 
+// Apply authentication to ALL staff routes
 router.use(validateSession);
 router.use(isStaff);
 
+// Staff routes
 router.get('/subjects', staffController.getAssignedSubjects);
 router.get('/students/all', staffController.getAllStudents);
 router.post('/assign-students', staffController.assignStudentsToSubject);

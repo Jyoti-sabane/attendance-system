@@ -74,6 +74,7 @@ const register = async (req, res) => {
 const logout = (req, res) => {
     req.session.destroy((err) => {
         if (err) {
+            console.error('Logout error:', err);
             return res.status(500).json({ error: 'Logout failed' });
         }
         res.json({ success: true, message: 'Logged out successfully' });
@@ -81,12 +82,17 @@ const logout = (req, res) => {
 };
 
 const checkSession = (req, res) => {
-    if (req.session.user) {
+    if (req.session && req.session.user) {
         res.json({ authenticated: true, user: req.session.user });
     } else {
         res.json({ authenticated: false });
     }
 };
 
-// CRITICAL: Make sure all functions are exported
-module.exports = { login, register, logout, checkSession };
+// MAKE SURE THIS EXPORT IS PRESENT AND CORRECT
+module.exports = {
+    login: login,
+    register: register,
+    logout: logout,
+    checkSession: checkSession
+};

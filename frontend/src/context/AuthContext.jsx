@@ -9,7 +9,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for saved token on app load
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
     
@@ -21,14 +20,9 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const response = await axios.post('https://attendance-system-hlpr.onrender.com/api/auth/login', credentials, {
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
-      console.log('Login response:', response.data);
+      const response = await axios.post('https://attendance-system-hlpr.onrender.com/api/auth/login', credentials);
       
       if (response.data.success) {
-        // Save token and user to localStorage
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         setUser(response.data.user);
@@ -37,7 +31,6 @@ export const AuthProvider = ({ children }) => {
       }
       return response.data;
     } catch (error) {
-      console.error('Login error:', error);
       const errorMsg = error.response?.data?.error || 'Login failed';
       toast.error(errorMsg);
       throw error;
@@ -53,14 +46,13 @@ export const AuthProvider = ({ children }) => {
         email: userData.email,
         full_name: userData.full_name,
         role: userData.role
-      }, {
-        headers: { 'Content-Type': 'application/json' }
       });
       
-      console.log('Register response:', response.data);
-      return response.data;
+      if (response.data.success) {
+        toast.success('Registration successful! Please login.');
+        return response.data;
+      }
     } catch (error) {
-      console.error('Register error:', error);
       const errorMsg = error.response?.data?.error || 'Registration failed';
       toast.error(errorMsg);
       throw error;

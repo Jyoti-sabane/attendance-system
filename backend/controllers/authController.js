@@ -21,6 +21,7 @@ const login = async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials!' });
         }
         
+        // Set session data
         req.session.user = {
             user_id: user._id,
             username: user.username,
@@ -29,13 +30,22 @@ const login = async (req, res) => {
         };
         req.session.lastActivity = Date.now();
         
-        console.log('Login successful:', username);
-        
-        res.json({ 
-            success: true, 
-            role: user.role,
-            user: req.session.user,
-            redirect: user.role === 'admin' ? '/admin/dashboard' : '/staff/dashboard'
+        // Save session
+        req.session.save((err) => {
+            if (err) {
+                console.error('Session save error:', err);
+                return res.status(500).json({ error: 'Session error' });
+            }
+            
+            console.log('Login successful for:', username);
+            console.log('Session ID:', req.session.id);
+            
+            res.json({ 
+                success: true, 
+                role: user.role,
+                user: req.session.user,
+                redirect: user.role === 'admin' ? '/admin/dashboard' : '/staff/dashboard'
+            });
         });
         
     } catch (error) {
@@ -89,10 +99,4 @@ const checkSession = (req, res) => {
     }
 };
 
-// MAKE SURE THIS EXPORT IS PRESENT AND CORRECT
-module.exports = {
-    login: login,
-    register: register,
-    logout: logout,
-    checkSession: checkSession
-};
+module.exports = { login, register, logout, checkSession };

@@ -1,3 +1,5 @@
+const User = require('../models/User');
+
 const login = async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -36,7 +38,6 @@ const login = async (req, res) => {
             }
             
             console.log('Login successful for:', username);
-            console.log('Session ID:', req.session.id);
             
             res.json({ 
                 success: true, 
@@ -52,13 +53,55 @@ const login = async (req, res) => {
     }
 };
 
-const checkSession = async (req, res) => {
-    console.log('Check session - Session ID:', req.session.id);
-    console.log('Session user:', req.session.user);
-    
+const register = async (req, res) => {
+    try {
+        const { username, password, confirm_password, email, full_name, role } = req.body;
+        
+        console.log('Registration attempt:', username);
+        
+        if (password !== confirm_password) {
+            return res.status(400).json({ error: 'Passwords do not match!' });
+        }
+        
+        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+        if (existingUser) {
+            return res.status(400).json({ error: 'Username or email already exists!' });
+        }
+        
+        const user = new User({ username, password, email, full_name, role });
+        await user.save();
+        
+        console.log('User created successfully:', username);
+        res.json({ success: true, message: 'Registration successful! You can now login.' });
+        
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const logout = (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Logout error:', err);
+            return res.status(500).json({ error: 'Logout failed' });
+        }
+        res.json({ success: true, message: 'Logged out successfully' });
+    });
+};
+
+const checkSession = (req, res) => {
     if (req.session.user) {
         res.json({ authenticated: true, user: req.session.user });
     } else {
         res.json({ authenticated: false });
     }
+};
+
+// MAKE SURE ALL FUNCTIONS ARE EXPORTED CORRECTLY
+module.exports = {
+    login,
+    register,
+    logout,
+    checkSession
 };

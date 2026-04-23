@@ -21,7 +21,6 @@ const login = async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials!' });
         }
         
-        // Set session data
         req.session.user = {
             user_id: user._id,
             username: user.username,
@@ -30,21 +29,13 @@ const login = async (req, res) => {
         };
         req.session.lastActivity = Date.now();
         
-        // Save session explicitly
-        req.session.save((err) => {
-            if (err) {
-                console.error('Session save error:', err);
-                return res.status(500).json({ error: 'Session error' });
-            }
-            
-            console.log('Login successful for:', username);
-            
-            res.json({ 
-                success: true, 
-                role: user.role,
-                user: req.session.user,
-                redirect: user.role === 'admin' ? '/admin/dashboard' : '/staff/dashboard'
-            });
+        console.log('Login successful:', username);
+        
+        res.json({ 
+            success: true, 
+            role: user.role,
+            user: req.session.user,
+            redirect: user.role === 'admin' ? '/admin/dashboard' : '/staff/dashboard'
         });
         
     } catch (error) {
@@ -71,7 +62,7 @@ const register = async (req, res) => {
         const user = new User({ username, password, email, full_name, role });
         await user.save();
         
-        console.log('User created successfully:', username);
+        console.log('User created:', username);
         res.json({ success: true, message: 'Registration successful! You can now login.' });
         
     } catch (error) {
@@ -83,7 +74,6 @@ const register = async (req, res) => {
 const logout = (req, res) => {
     req.session.destroy((err) => {
         if (err) {
-            console.error('Logout error:', err);
             return res.status(500).json({ error: 'Logout failed' });
         }
         res.json({ success: true, message: 'Logged out successfully' });
@@ -98,10 +88,5 @@ const checkSession = (req, res) => {
     }
 };
 
-// MAKE SURE ALL FUNCTIONS ARE EXPORTED CORRECTLY
-module.exports = {
-    login,
-    register,
-    logout,
-    checkSession
-};
+// CRITICAL: Make sure all functions are exported
+module.exports = { login, register, logout, checkSession };

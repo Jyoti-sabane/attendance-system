@@ -4,7 +4,7 @@ const validateSession = (req, res, next) => {
     console.log('Session user:', req.session?.user);
     
     if (!req.session || !req.session.user) {
-        console.log('No session found, returning 401');
+        console.log('No valid session found');
         return res.status(401).json({ error: 'Please login first' });
     }
     

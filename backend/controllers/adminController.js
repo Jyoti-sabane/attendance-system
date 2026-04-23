@@ -151,7 +151,6 @@ const addSubject = async (req, res) => {
     try {
         const { subject_code, subject_name } = req.body;
         
-        // Check if subject code already exists
         const existing = await Subject.findOne({ subject_code: subject_code.toUpperCase() });
         if (existing) {
             return res.status(400).json({ error: 'Subject code already exists!' });
@@ -176,7 +175,6 @@ const updateSubject = async (req, res) => {
         const { subject_code, subject_name } = req.body;
         const subjectId = req.params.id;
         
-        // Check if another subject has the same code
         const existing = await Subject.findOne({ 
             subject_code: subject_code.toUpperCase(),
             _id: { $ne: subjectId }
@@ -214,7 +212,6 @@ const deleteSubject = async (req, res) => {
             return res.status(404).json({ error: 'Subject not found' });
         }
         
-        // Also delete related assignments
         await StaffSubject.deleteMany({ subject_id: subjectId });
         await StudentSubject.deleteMany({ subject_id: subjectId });
         
@@ -252,7 +249,7 @@ const assignStaffToSubject = async (req, res) => {
         const assignment = new StaffSubject({ staff_id, subject_id });
         await assignment.save();
         
-        console.log('Staff assigned to subject:', staff_id, subject_id);
+        console.log('Staff assigned to subject');
         res.json({ success: true, message: 'Staff assigned successfully!' });
     } catch (error) {
         console.error('Error assigning staff:', error);
@@ -265,7 +262,6 @@ const getAssignments = async (req, res) => {
         const assignments = await StaffSubject.find()
             .populate('staff_id', 'full_name username')
             .populate('subject_id', 'subject_code subject_name');
-        console.log('Assignments found:', assignments.length);
         res.json(assignments);
     } catch (error) {
         console.error('Error fetching assignments:', error);
@@ -276,11 +272,54 @@ const getAssignments = async (req, res) => {
 const removeAssignment = async (req, res) => {
     try {
         await StaffSubject.findByIdAndDelete(req.params.id);
-        console.log('Assignment removed:', req.params.id);
+        console.log('Assignment removed');
         res.json({ success: true, message: 'Assignment removed successfully!' });
     } catch (error) {
         console.error('Error removing assignment:', error);
         res.status(500).json({ error: error.message });
+    }
+};
+
+// ========== EXPORT FUNCTIONS (FIX FOR THE RENDER ERROR) ==========
+/**
+ * Generates an Excel report for attendance.
+ * This function is required by adminRoutes.js
+ */
+const generateExcelReport = async (req, res) => {
+    try {
+        const { month, year } = req.query;
+        console.log(`Excel report requested for ${month}/${year}`);
+        
+        // TODO: Implement full Excel generation logic here
+        // For now, return a success message to prevent the route from crashing
+        res.status(200).json({ 
+            success: true, 
+            message: `Excel report for ${month}/${year} - Feature coming soon!` 
+        });
+    } catch (error) {
+        console.error('Error generating Excel report:', error);
+        res.status(500).json({ error: 'Failed to generate report' });
+    }
+};
+
+/**
+ * Generates a CSV report for attendance.
+ * This function is required by adminRoutes.js
+ */
+const generateCSVReport = async (req, res) => {
+    try {
+        const { month, year } = req.query;
+        console.log(`CSV report requested for ${month}/${year}`);
+        
+        // TODO: Implement full CSV generation logic here
+        // For now, return a success message to prevent the route from crashing
+        res.status(200).json({ 
+            success: true, 
+            message: `CSV report for ${month}/${year} - Feature coming soon!` 
+        });
+    } catch (error) {
+        console.error('Error generating CSV report:', error);
+        res.status(500).json({ error: 'Failed to generate report' });
     }
 };
 
@@ -312,5 +351,9 @@ module.exports = {
     // Staff-Subject Assignment
     assignStaffToSubject,
     getAssignments,
-    removeAssignment
+    removeAssignment,
+    
+    // Export Functions (CRITICAL: These were missing and causing the error)
+    generateExcelReport,
+    generateCSVReport
 };

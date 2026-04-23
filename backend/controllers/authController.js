@@ -4,24 +4,24 @@ const login = async (req, res) => {
     try {
         const { username, password } = req.body;
         
-        console.log('Login attempt:', username);
+        console.log('📝 Login attempt:', username);
         
         const user = await User.findOne({ 
             $or: [{ username: username }, { email: username }] 
         });
         
         if (!user) {
-            console.log('User not found:', username);
+            console.log('❌ User not found:', username);
             return res.status(401).json({ error: 'Invalid credentials!' });
         }
         
         const isValid = await user.comparePassword(password);
         if (!isValid) {
-            console.log('Invalid password for:', username);
+            console.log('❌ Invalid password for:', username);
             return res.status(401).json({ error: 'Invalid credentials!' });
         }
         
-        // Set session data
+        // Set session
         req.session.user = {
             user_id: user._id,
             username: user.username,
@@ -30,16 +30,17 @@ const login = async (req, res) => {
         };
         req.session.lastActivity = Date.now();
         
-        // Save session
+        // Save session and send response
         req.session.save((err) => {
             if (err) {
-                console.error('Session save error:', err);
+                console.error('❌ Session save error:', err);
                 return res.status(500).json({ error: 'Session error' });
             }
             
-            console.log('Login successful for:', username);
-            console.log('Session ID:', req.session.id);
+            console.log('✅ Login successful for:', username);
+            console.log('📌 Session ID:', req.sessionID);
             
+            // Send response
             res.json({ 
                 success: true, 
                 role: user.role,
@@ -49,7 +50,7 @@ const login = async (req, res) => {
         });
         
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('❌ Login error:', error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -58,7 +59,7 @@ const register = async (req, res) => {
     try {
         const { username, password, confirm_password, email, full_name, role } = req.body;
         
-        console.log('Registration attempt:', username);
+        console.log('📝 Registration attempt:', username);
         
         if (password !== confirm_password) {
             return res.status(400).json({ error: 'Passwords do not match!' });
@@ -72,11 +73,11 @@ const register = async (req, res) => {
         const user = new User({ username, password, email, full_name, role });
         await user.save();
         
-        console.log('User created:', username);
+        console.log('✅ User created:', username);
         res.json({ success: true, message: 'Registration successful! You can now login.' });
         
     } catch (error) {
-        console.error('Registration error:', error);
+        console.error('❌ Registration error:', error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -84,9 +85,10 @@ const register = async (req, res) => {
 const logout = (req, res) => {
     req.session.destroy((err) => {
         if (err) {
-            console.error('Logout error:', err);
+            console.error('❌ Logout error:', err);
             return res.status(500).json({ error: 'Logout failed' });
         }
+        console.log('✅ Logout successful');
         res.json({ success: true, message: 'Logged out successfully' });
     });
 };

@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { validateSession, isStaff } = require('../middleware/auth');
+const { verifyToken, isStaff } = require('../middleware/authJWT');
 const staffController = require('../controllers/staffController');
 
-// Apply validation to ALL staff routes
-router.use(validateSession);
+// Apply JWT verification to ALL staff routes
+router.use(verifyToken);
 router.use(isStaff);
 
 // Staff routes
